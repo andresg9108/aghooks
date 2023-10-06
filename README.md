@@ -1,1 +1,3 @@
-# aghooks
+# AGHooks
+
+Useful hooks.
