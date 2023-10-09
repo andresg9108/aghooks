@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { 
+  useState 
+} from 'react';
 
-const useTest = (initialValue = false) => {
+export const useTest = (initialValue = false) => {
   const [value, setValue] = useState(initialValue);
 
   const toggle = () => {
@@ -9,5 +11,3 @@ const useTest = (initialValue = false) => {
 
   return [value, toggle];
 };
-
-export default useTest;
