@@ -16,18 +16,18 @@ export const useEditableElement = () => {
   const getCharacters = (oData) => {
     let oElement = elementRef.current;
 
-  	let iCursorPosition = getKeyboardCursorPosition({
-  		element: oElement 
-  	});
-  	let sText = oElement.textContent.replace(/\u00a0/g, ' ');
+    let iCursorPosition = getKeyboardCursorPosition({
+      element: oElement 
+    });
+    let sText = oElement.textContent.replace(/\u00a0/g, ' ');
 
-  	let iStartIndex = sText.substr(0, iCursorPosition).lastIndexOf(" ") + 1;
-  	iStartIndex = iStartIndex !== -1 ? iStartIndex : 0;
+    let iStartIndex = sText.substr(0, iCursorPosition).lastIndexOf(" ") + 1;
+    iStartIndex = iStartIndex !== -1 ? iStartIndex : 0;
 
-  	let iEndIndex = sText.slice(iStartIndex).indexOf(" ");
-  	iEndIndex = iEndIndex !== -1 ? iEndIndex + iStartIndex : sText.length;
+    let iEndIndex = sText.slice(iStartIndex).indexOf(" ");
+    iEndIndex = iEndIndex !== -1 ? iEndIndex + iStartIndex : sText.length;
 
-  	return sText.substring(iStartIndex, iEndIndex).trim().toLowerCase()
+    return sText.substring(iStartIndex, iEndIndex).trim().toLowerCase()
   }
 
   /*
@@ -37,20 +37,20 @@ export const useEditableElement = () => {
   09-10-2023
   */
   const getKeyboardCursorPosition = (oData) => {
-  	let oElement = oData.element !== undefined ? oData.element : null;
+    let oElement = oData.element !== undefined ? oData.element : null;
 
-  	let caretOffset = 0;
-  	let doc = oElement.ownerDocument || oElement.document;
-  	let win = doc.defaultView || doc.parentWindow;
-  	let sel = win.getSelection();
-  	if (sel.rangeCount > 0) {
-  		let range = sel.getRangeAt(0);
-  		let preCaretRange = range.cloneRange();
-  		preCaretRange.selectNodeContents(oElement);
-  		preCaretRange.setEnd(range.endContainer, range.endOffset);
-  		caretOffset = preCaretRange.toString().length;
-  	}
-  	return caretOffset;
+    let caretOffset = 0;
+    let doc = oElement.ownerDocument || oElement.document;
+    let win = doc.defaultView || doc.parentWindow;
+    let sel = win.getSelection();
+    if (sel.rangeCount > 0) {
+      let range = sel.getRangeAt(0);
+      let preCaretRange = range.cloneRange();
+      preCaretRange.selectNodeContents(oElement);
+      preCaretRange.setEnd(range.endContainer, range.endOffset);
+      caretOffset = preCaretRange.toString().length;
+    }
+    return caretOffset;
   }
 
   /*
@@ -61,16 +61,16 @@ export const useEditableElement = () => {
   */
   const completeString = (oData) => {
     let oElement = elementRef.current;
-  	let sCharactersSet = oData.charactersset !== undefined ? oData.charactersset : '';
-  	let sString = oData.string !== undefined ? oData.string : '';
-  	let oChild = oElement.firstChild;
+    let sCharactersSet = oData.charactersset !== undefined ? oData.charactersset : '';
+    let sString = oData.string !== undefined ? oData.string : '';
+    let oChild = oElement.firstChild;
 
-  	do{
-  		if(oChild.nodeType === Node.TEXT_NODE){
-  			oChild.textContent = oChild.textContent.replace(new RegExp(sCharactersSet, 'i'), sString);
-  		}
-  		oChild = oChild.nextSibling;
-  	}while(oChild !== null);
+    do{
+      if(oChild.nodeType === Node.TEXT_NODE){
+        oChild.textContent = oChild.textContent.replace(new RegExp(sCharactersSet, 'i'), sString);
+      }
+      oChild = oChild.nextSibling;
+    }while(oChild !== null);
   }
 
   /*
@@ -209,10 +209,60 @@ export const useEditableElement = () => {
     sel.addRange(range);
   }
 
+  /*
+  Description: Text paste controller.
+  Descripción: Controlador de pegado de texto.
+  Andrés González
+  11-10-2023
+  */
+  const handlePaste = (event) => {
+    event.preventDefault();
+    const oClipboardData = event.clipboardData || window.clipboardData;
+    const sText = oClipboardData.getData('text/plain');
+
+    const oTemporaryElement = document.createElement('div');
+    oTemporaryElement.innerHTML = sText;
+    const sNewText = oTemporaryElement.textContent || oTemporaryElement.innerText || '';
+
+    setTimeout(() => {
+      document.execCommand('insertText', false, sNewText);
+    }, 0);
+  };
+
+  /*
+  Description: Handler for keyboard events that come from the prompt.
+  Descripción: Controlador de los eventos del teclado que provienen del prompt.
+  Andrés González
+  11-10-2023
+  */
+  const handleKeyDown = (event) => {
+    switch(event.key){
+      case 'Enter':
+        event.preventDefault();
+
+        if(event.shiftKey){
+          setTimeout(() => {
+            document.execCommand('insertText', false, '\n');
+          }, 0);
+        }else{
+          let oForm = event.target.closest('form');
+          let oSubmitEvent = new Event('submit', { bubbles: true });
+          
+          oForm.dispatchEvent(oSubmitEvent);
+        }
+
+        break;
+      default:
+        break;
+    }
+  }
+
   return [{
-  		completeString, 
+      completeString, 
       focus, 
       getCharacters, 
+      handleKeyDown, 
+      handlePaste, 
       updateSpanByCharacters 
-  	}, elementRef];
+    }, elementRef];
 };
