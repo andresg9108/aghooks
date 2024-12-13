@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "outDir": "./dist",
+    "outDir": "./",
     "module": "esnext",
     "target": "es6",
     "declaration": true,
