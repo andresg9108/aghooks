@@ -1,12 +1,10 @@
 {
   "name": "ag-hooks",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Useful hooks.",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "components",
+    "hooks"
   ],
   "scripts": {
     "build": "tsc",
