@@ -1,17 +1,26 @@
 import { useState, useEffect } from 'react';
 export default function useDimensions() {
     const [dimensions, setDimensions] = useState({
-        width: window.innerWidth,
-        height: window.innerHeight,
+        width: 0,
+        height: 0,
     });
     useEffect(() => {
-        function handleResize() {
+        if (typeof window !== 'undefined') {
             setDimensions({
                 width: window.innerWidth,
                 height: window.innerHeight,
             });
+            function handleResize() {
+                setDimensions({
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                });
+            }
+            window.addEventListener('resize', handleResize);
+            return () => {
+                window.removeEventListener('resize', handleResize);
+            };
         }
-        window.addEventListener('resize', handleResize);
     }, []);
     return {
         width: dimensions.width,
