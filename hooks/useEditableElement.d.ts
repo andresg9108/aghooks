@@ -10,7 +10,7 @@ export default function useEditableElement({ pasteClean, enterForSubmit, htmlDef
     onKeyDown: (event: KeyboardEvent) => void;
     focus?: undefined;
     updateSpanByCharacters?: undefined;
-    completeString?: undefined;
+    replaceString?: undefined;
     getCharacters?: undefined;
 } | {
     focus: (oData: any) => void;
@@ -22,9 +22,9 @@ export default function useEditableElement({ pasteClean, enterForSubmit, htmlDef
             onEdit: () => void;
         };
     }) => void;
-    completeString: (oData: {
-        charactersset?: string;
-        string?: string;
+    replaceString: (oData: {
+        charactersset: string;
+        string: string;
     }) => void;
     getCharacters: () => string;
     ref?: undefined;

@@ -107,7 +107,7 @@ export default function useEditableElement({ pasteClean = false, enterForSubmit 
     const updateSpanByCharacters = (oDataSet) => {
         const oElement = elementRef.current;
         const sCharactersSet = oDataSet.charactersSet !== undefined ? oDataSet.charactersSet : '';
-        let oData = oDataSet.data !== undefined ? oDataSet.data : { onEdit: () => { } }; // Asignar un valor por defecto a onEdit
+        let oData = oDataSet.data !== undefined ? oDataSet.data : { onEdit: () => { } };
         const sDataId = oData.dataid !== undefined ? oData.dataid : '';
         if (oElement) {
             if (sDataId !== '') {
@@ -125,41 +125,39 @@ export default function useEditableElement({ pasteClean = false, enterForSubmit 
                 oData.dataid = uuidv4();
                 let oChild = oElement.firstChild;
                 while (oChild !== null) {
-                    if (oChild.nodeType === Node.TEXT_NODE) {
-                        const sChildText = oChild.textContent || '';
-                        if (sChildText.indexOf(sCharactersSet) !== -1) {
-                            const sCharactersSetFilter = sCharactersSet.replace('(', '\\(').replace('/', '\\/');
-                            const aText = sChildText.split(new RegExp(`(${sCharactersSetFilter})`, 'g'));
-                            const oParent = oChild.parentNode;
-                            let iCount = 0;
-                            let oNext = oChild;
-                            for (let i = 0; i < aText.length; i++) {
-                                const sText = aText[i];
-                                if (sText === sCharactersSet) {
-                                    const oSpan = document.createElement('span');
-                                    loadSpanAndData(oSpan, oData);
-                                    if (iCount === 0) {
-                                        oParent.replaceChild(oSpan, oChild);
-                                    }
-                                    else {
-                                        oParent.insertBefore(oSpan, oNext.nextSibling);
-                                    }
-                                    const oBlankSpace = document.createTextNode('\u00A0'); // &nbsp;
-                                    oParent.insertBefore(oBlankSpace, oSpan.nextSibling);
-                                    oNext = oBlankSpace;
-                                    iCount++;
+                    const sChildText = oChild.textContent || '';
+                    if (sChildText.indexOf(sCharactersSet) !== -1) {
+                        const sCharactersSetFilter = sCharactersSet.replace('(', '\\(').replace('/', '\\/');
+                        const aText = sChildText.split(new RegExp(`(${sCharactersSetFilter})`, 'g'));
+                        const oParent = oChild.parentNode;
+                        let iCount = 0;
+                        let oNext = oChild;
+                        for (let i = 0; i < aText.length; i++) {
+                            const sText = aText[i];
+                            if (sText === sCharactersSet) {
+                                const oSpan = document.createElement('span');
+                                loadSpanAndData(oSpan, oData);
+                                if (iCount === 0) {
+                                    oParent.replaceChild(oSpan, oChild);
                                 }
-                                else if (sText !== '') {
-                                    const oText = document.createTextNode(sText);
-                                    if (iCount === 0) {
-                                        oParent.replaceChild(oText, oChild);
-                                    }
-                                    else {
-                                        oParent.insertBefore(oText, oNext.nextSibling);
-                                    }
-                                    oNext = oText;
-                                    iCount++;
+                                else {
+                                    oParent.insertBefore(oSpan, oNext.nextSibling);
                                 }
+                                const oBlankSpace = document.createTextNode('\u00A0'); // &nbsp;
+                                oParent.insertBefore(oBlankSpace, oSpan.nextSibling);
+                                oNext = oBlankSpace;
+                                iCount++;
+                            }
+                            else if (sText !== '') {
+                                const oText = document.createTextNode(sText);
+                                if (iCount === 0) {
+                                    oParent.replaceChild(oText, oChild);
+                                }
+                                else {
+                                    oParent.insertBefore(oText, oNext.nextSibling);
+                                }
+                                oNext = oText;
+                                iCount++;
                             }
                         }
                     }
@@ -169,21 +167,19 @@ export default function useEditableElement({ pasteClean = false, enterForSubmit 
         }
     };
     /*
-    Description: Complete a string of characters in an editable DOM element.
-    Descripción: Complete una cadena de caracteres en un elemento editable del DOM.
+    Description: Replace one string with another in an editable DOM element.
+    Descripción: Reemplazar una cadena por otra en un elemento DOM editable.
     Andrés González
-    09-10-2023
+    31-12-2024
     */
-    const completeString = (oData) => {
+    const replaceString = (oData) => {
         var _a;
         const oElement = elementRef.current;
         const sCharactersSet = oData.charactersset !== undefined ? oData.charactersset : '';
         const sString = oData.string !== undefined ? oData.string : '';
         let oChild = oElement === null || oElement === void 0 ? void 0 : oElement.firstChild;
         while (oChild !== null) {
-            if (oChild.nodeType === Node.TEXT_NODE) {
-                oChild.textContent = ((_a = oChild.textContent) === null || _a === void 0 ? void 0 : _a.replace(new RegExp(sCharactersSet, 'i'), sString)) || '';
-            }
+            oChild.textContent = ((_a = oChild.textContent) === null || _a === void 0 ? void 0 : _a.replace(new RegExp(sCharactersSet, 'gi'), sString)) || '';
             oChild = oChild.nextSibling;
         }
     };
@@ -242,7 +238,7 @@ export default function useEditableElement({ pasteClean = false, enterForSubmit 
         }, {
             focus,
             updateSpanByCharacters,
-            completeString,
+            replaceString,
             getCharacters,
         }];
 }
